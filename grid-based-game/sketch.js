@@ -1,25 +1,37 @@
 // Grid Based Game
 
-let grid;
-let gridSize = 30;
+let grid, block;
+let gridDimensions = 30;
 let cellWidth, cellHeight;
+let layer = 0;
+let dx = 0;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  grid = createEmpty2DArray(gridSize, gridSize);
+  grid = createEmpty2DArray(gridDimensions, gridDimensions);
   
-  cellWidth = width/gridSize;
-  cellHeight = height/gridSize;
+  cellWidth = width/gridDimensions;
+  cellHeight = height/gridDimensions;
+
+  block = {
+    blockX: 0,
+    blockY: gridDimensions - layer,
+  };
 }
 
 function draw() {
   background(220);
-  displayGrid();
+  // displayGrid();
+
+  // // if (frameCount % 10 === 0) {
+  moveBlocks(blockX+1, blockY);
+  // }
+
 }
 
 function mousePressed() {
-  let cellWidth = width/gridSize;
-  let cellHeight = height/gridSize;
+  let cellWidth = width/gridDimensions;
+  let cellHeight = height/gridDimensions;
 
   let cellX = Math.floor(mouseX/cellWidth);
   let cellY = Math.floor(mouseY/cellHeight);
@@ -32,15 +44,16 @@ function mousePressed() {
   }
 }
 
-function keyPressed() {
-  if (keyCode === 82) {
-    grid = createRandom2DArray(gridSize, gridSize);
-  }
+function moveBlocks(newX) {
+  grid[blockY][x-1] = 1;
+  grid[blockY][x] = 1;
+  grid[blockY][x+1] = 1;
+
 }
 
 function displayGrid() {
-  for (let y = 0; y<gridSize; y++) {
-    for (let x=0; x<gridSize; x++) {
+  for (let y = 0; y<gridDimensions; y++) {
+    for (let x=0; x<gridDimensions; x++) {
       if (grid[y][x] === 0) {
         fill("white");
       }
@@ -58,22 +71,6 @@ function createEmpty2DArray(rows, cols) {
     grid.push([]);
     for (let x=0; x<cols; x++) {
       grid[y].push(0);
-    }
-  }
-  return grid;
-}
-
-function createRandom2DArray(rows, cols) {
-  let grid = [];
-  for (let y=0; y<rows; y++) {
-    grid.push([]);
-    for (let x=0; x<cols; x++) {
-      if (random(100) < 50) {
-        grid[y].push(0);
-      }
-      else {
-        grid[y].push(1);
-      }
     }
   }
   return grid;
