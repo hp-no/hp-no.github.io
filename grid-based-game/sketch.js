@@ -7,8 +7,12 @@ let layer = 0;
 let dx = 1;
 
 function setup() {
-  // Note: MAKE CHANGES TO DO windowwidth *windowwidth OR windowHeight*windowHeight
-  createCanvas(windowWidth*0.9, windowHeight*0.9);
+  if (windowWidth < windowHeight) {
+    createCanvas(windowWidth*0.9, windowWidth*0.9);
+  }
+  else {
+    createCanvas(windowHeight*0.9, windowHeight*0.9);
+  }
   grid = createEmpty2DArray(gridDimensions, gridDimensions);
   
   cellWidth = width/gridDimensions;
@@ -16,19 +20,25 @@ function setup() {
 
   block = {
     x: 0,
-    y: gridDimensions-2 //- layer, temporarily 5
+    y: gridDimensions-2,
+    speed: 5, //the lower the number, the faster
   };
-
-  //put block on grid
-  grid[block.y][block.x] = 9;
 }
 
 function draw() {
   background(220);
   displayGrid();
 
-  if (frameCount % 5 === 0) {
-    moveBlocks(block.x+dx);
+  if (frameCount % block.speed === 0) {
+    moveBlocks(block.x + dx, block.y - layer); 
+    //problem: when block.y is set to newY, it keeps adding the layers to the new block., creating a loop of the blocks floating up
+  }
+}
+
+function keyPressed() {
+  if (key === "k") {
+    // placeBlocks();
+    layer++;
   }
 }
 
@@ -47,22 +57,30 @@ function draw() {
 //   }
 // }
 
-function moveBlocks(newX) {
+function moveBlocks(newX, newY) {
   if (newX-1 >= 0 && newX+1 < gridDimensions) {
     //set previous location to empty
-    grid[block.y][block.x-1] = 0; //back end
+    grid[block.y][block.x-1] = 0; //back block
     grid[block.y][block.x] = 0; //middle block
-    grid[block.y][block.x+1] = 0; //front end
+    grid[block.y][block.x+1] = 0; //front block
+
     block.x = newX;
-  
+    block.y = newY;
+
     //fill in new location spot
-    grid[block.y][block.x-1] = 9; //back end
+    grid[block.y][block.x-1] = 9; //back block
     grid[block.y][block.x] = 9; //middle block
-    grid[block.y][block.x+1] = 9; //front end
+    grid[block.y][block.x+1] = 9; //front block
   }
   else {
     dx = -dx;
   }
+}
+
+function placeBlocks() {
+  grid[block.y][block.x-1] = 1; //back block
+  grid[block.y][block.x] = 1; //middle block
+  grid[block.y][block.x+1] = 1; //front block
 }
 
 function displayGrid() {
