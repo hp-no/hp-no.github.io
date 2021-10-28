@@ -32,6 +32,7 @@ function draw() {
   if (frameCount % block.speed === 0) {
     moveBlocks(block.x + dx, block.y - layer); 
     //problem: when block.y is set to newY, it keeps adding the layers to the new block., creating a loop of the blocks floating up
+    //idea(?): use OOP, when ENTER is pressed, spawn a new platform and change the state of the previous platform to stop the movement...
   }
 }
 
