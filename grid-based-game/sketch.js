@@ -1,6 +1,7 @@
 // Grid Based Game
-
+let platformArray = [];
 let grid, block;
+let state = "idle";
 let gridDimensions = 30;
 let cellWidth, cellHeight;
 let layer = 0;
@@ -33,55 +34,48 @@ function draw() {
     moveBlocks(block.x + dx, block.y - layer); 
     //problem: when block.y is set to newY, it keeps adding the layers to the new block., creating a loop of the blocks floating up
     //idea(?): use OOP, when ENTER is pressed, spawn a new platform and change the state of the previous platform to stop the movement...
+    // platformArray = [];
   }
 }
 
 function keyPressed() {
   if (key === "k") {
-    placeBlocks();
+    state = "new layer";
+  }
+}
+
+function moveBlocks(newX, newY) {
+  if (state === "idle") {
+    if (newX-1 >= 0 && newX+1 < gridDimensions) {
+      //set previous location to empty
+      grid[block.y][block.x-1] = 0; //back block
+      grid[block.y][block.x] = 0; //middle block
+      grid[block.y][block.x+1] = 0; //front block
+  
+      block.x = newX;
+      block.y = newY;
+  
+      //fill in new location spot
+      grid[block.y][block.x-1] = 9; //back block
+      grid[block.y][block.x] = 9; //middle block
+      grid[block.y][block.x+1] = 9; //front block
+    }
+    else {
+      dx = -dx;
+    }
+  }
+  else if (state === "new layer") {
+    placeBlocks(newX, newY);
+
+    state = "idle";
     layer++;
   }
 }
 
-// function mousePressed() {
-//   let cellWidth = width/gridDimensions;
-//   let cellHeight = height/gridDimensions;
-
-//   let cellX = Math.floor(mouseX/cellWidth);
-//   let cellY = Math.floor(mouseY/cellHeight);
-
-//   if (grid[cellY][cellX] === 1) {
-//     grid[cellY][cellX] = 0;
-//   }
-//   else if (grid[cellY][cellX] === 0) {
-//     grid[cellY][cellX] = 1;
-//   }
-// }
-
-function moveBlocks(newX, newY) {
-  if (newX-1 >= 0 && newX+1 < gridDimensions) {
-    //set previous location to empty
-    grid[block.y][block.x-1] = 0; //back block
-    grid[block.y][block.x] = 0; //middle block
-    grid[block.y][block.x+1] = 0; //front block
-
-    block.x = newX;
-    block.y = newY;
-
-    //fill in new location spot
-    grid[block.y][block.x-1] = 9; //back block
-    grid[block.y][block.x] = 9; //middle block
-    grid[block.y][block.x+1] = 9; //front block
-  }
-  else {
-    dx = -dx;
-  }
-}
-
-function placeBlocks() {
-  grid[block.y][block.x-1] = 1; //back block
-  grid[block.y][block.x] = 1; //middle block
-  grid[block.y][block.x+1] = 1; //front block
+function placeBlocks(x, y) {
+  grid[y][x-1] = 1; //back block
+  grid[y][x] = 1; //middle block
+  grid[y][x+1] = 1; //front block
 }
 
 function displayGrid() {
@@ -111,3 +105,51 @@ function createEmpty2DArray(rows, cols) {
   }
   return grid;
 }
+
+// Draft for using OOP in grid-based game:
+
+// class Platform {
+//   constructor(x, row) {
+//     this.x = x;
+//     this.y = gridDimensions-3 - row;
+//     this.dx = 3;
+//   }
+
+//   moveOrPlace() {
+//     if (state === "move") {
+//       this.move();
+//     }
+//     else if (state === "place") {
+//       this.place();
+//     }
+//   }
+
+//   move() {
+//     if (this.x-1 >= 0 && this.x+1 <= gridDimensions) {
+//       //set previous location to empty
+//       grid[this.y][this.x-1] = 0;
+//       grid[this.y][this.x] = 0;
+//       grid[this.y][this.x+1] = 0;
+  
+//       this.x += this.dx;
+  
+//       //fill in new location spot
+//       grid[this.y][this.x-1] = 9;
+//       grid[this.y][this.x] = 9;
+//       grid[this.y][this.x+1] = 9;
+//     }
+//     else {
+//       this.dx = -this.dx;
+//     }
+//   }
+
+//   place() {
+//     grid[this.y][this.x-1] = 1;
+//     grid[this.y][this.x] = 1;
+//     grid[this.y][this.x+1] = 1;
+
+//     this.y -= 1;
+
+//     state = "move";
+//   }
+// }
