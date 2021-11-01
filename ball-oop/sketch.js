@@ -31,7 +31,15 @@ function draw() {
 }
 
 function mousePressed() {
-  for (let i=0; i<10; i++) {
+  for (let i = ballArray.length-1; i >= 0; i--) {
+    if (ballArray[i].isPointInBall(mouseX, mouseY)) {
+      ballArray.splice(i, 1);
+    }
+  }
+}
+
+function keyPressed() {
+  if (key === " ") {
     let theBall = new Ball(mouseX, mouseY, catImg);
     ballArray.push(theBall);
   }
@@ -57,9 +65,9 @@ class Ball {
   
   display() {
     if (this.toDisplay === "circle") {
-      // noStroke();
-      // fill(this.theColour);
-      // circle(this.x, this.y, this.radius*2);
+      noStroke();
+      fill(this.theColour);
+      circle(this.x, this.y, this.radius*2);
     }
     else if (this.toDisplay === "image") {
       imageMode(CENTER);
@@ -76,6 +84,16 @@ class Ball {
     }
     if (this.y + this.radius >= height || this.y - this.radius <= 0) {
       this.dy *= -1;
+    }
+  }
+
+  isPointInBall(x, y) {
+    if (dist(x, y, this.x, this.y) < this.radius) {
+      // inside ball
+      return true;
+    }
+    else {
+      return false;
     }
   }
 }
