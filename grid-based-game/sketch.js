@@ -8,11 +8,12 @@
 
 
 let platformArray = [];
+let startingPlatform;
 let grid, block;
 let state = "idle";
 let gridDimensions = 30;
 let cellWidth, cellHeight;
-let layer = 0;
+let row = 0; //let layer = 0
 let dx = 1;
 
 function setup() {
@@ -23,9 +24,14 @@ function setup() {
     createCanvas(windowHeight*0.9, windowHeight*0.9);
   }
   grid = createEmpty2DArray(gridDimensions, gridDimensions);
-  
+
   cellWidth = width/gridDimensions;
   cellHeight = height/gridDimensions;
+
+  startingPlatform = new Platform(width/2, -1); // base foundation/platform the player stacks on
+
+  let thePlatform = new Platform(random(gridDimensions), row);
+  platformArray.push(thePlatform);
 
   // block = {
   //   x: 0,
@@ -38,13 +44,16 @@ function draw() {
   background(220);
   displayGrid();
 
+  startingPlatform.place();
+  platformArray[0].move();
+  
   // if (frameCount % block.speed === 0) {
   //   moveBlocks(block.x + dx, block.y - layer); 
-    //problem: when block.y is set to newY, it keeps adding the layers to the new block., creating a loop of the blocks floating up
-//     //idea(?): use OOP, when ENTER is pressed, spawn a new platform and change the state of the previous platform to stop the movement...
+//     // problem: when block.y is set to newY, it keeps adding the layers to the new block., creating a loop of the blocks floating up
+//     // idea(?): use OOP, when ENTER is pressed, spawn a new platform and change the state of the previous platform to stop the movement...
 //     // platformArray = [];
 //   }
-// }
+}
 
 class Platform {
   constructor(x, row) {
@@ -85,13 +94,12 @@ class Platform {
 
 function keyPressed() {
   if (key === "k") {
-    thePlatform.place();
+    thePlatform.place(); // or platformArray[0].place();
     platformArray.pop;
 
-    x = random(gridDimensions);
     row++;
 
-    let thePlatform = new Platform(x, row);
+    let thePlatform = new Platform(random(gridDimensions), row);
     platformArray.push(thePlatform);
   }
 }
