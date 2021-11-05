@@ -13,6 +13,7 @@
 //Incorporate a "if blocks !== 0" thing
 
 // If incorportating a start/title menu, incorporate removeElments(); command to get remove the text and move onto the game screen
+// Incorporate a "game over menu" with buttons that let you "try again"(reset) or go to the"title screen"
 // what is touchStarted();?
 
 // Global Variables
@@ -26,7 +27,8 @@ let startingPlatform;
 let removedBlocks = 0;
 let row = 0; //let layer = 0
 let dx = 1;
-let state = "idle";
+// let state = "idle";
+let gameState;
 
 
 
@@ -54,7 +56,7 @@ function draw() {
   background(220);
   displayGrid();
 
-  startingPlatform.place();
+  startingPlatform.place(); // or place in setup
   platformArray[0].move();
   
   // if (frameCount % block.speed === 0) {
@@ -75,38 +77,50 @@ class Platform {
   }
 
   move() {
-    if (this.state === "move") {
+    if (this.state === "move" && this.platformLength > 0) {
       if (this.x-1 >= 0 && this.x+1 <= gridDimensions) {
-        // //set previous location to empty
-        // grid[this.y][this.x-1] = 0;
-        // grid[this.y][this.x] = 0;
-        // grid[this.y][this.x+1] = 0;
+        //set previous location to empty
+        grid[this.y][this.x-1] = 0;
+        grid[this.y][this.x] = 0;
+        grid[this.y][this.x+1] = 0;
     
-        // this.x += this.dx;
+        this.x += this.dx;
     
-        // //fill in new location spot
-        // grid[this.y][this.x-1] = 9;
-        // grid[this.y][this.x] = 9;
-        // grid[this.y][this.x+1] = 9;
+        //fill in new location spot
+        grid[this.y][this.x-1] = 9;
+        grid[this.y][this.x] = 9;
+        grid[this.y][this.x+1] = 9;
 
-        for (let i = -1; i < this.platformLength - 1; i++)
+
+        // // Alternative Code:
+        // for (let i = -1; i < this.platformLength - 1; i++) {
+        //   grid[this.y][this.x + i] = 0;
+        // }
+        // this.x += this.dx;
+        // for (let i = -1; i < this.platformLength - 1; i++) {
+        //   grid[this.y][this.x + i] = 9;
+        // }
+
       }
       else {
         this.dx = -this.dx;
       }
+    }
+    else {
+      gameState = "end screen";
     }
   }
 
   place() {
     this.state = "place"; // stops platform movement
 
-    for (let i = -1; i <= 1; i++) {
-    // checks if there is a block on row below
-      if (grid[this.y - 1][this.x + i] === 1) { 
-        grid[this.y][this.x + i] = 1; // if true, places block down
+    // checks if there is a block on the row below
+    for (let i = -1; i <= 1; i++) { 
+      if (grid[this.y - 1][this.x + i] === 1) { // if true, places block down
+        grid[this.y][this.x + i] = 1; 
       }
-      else {
-        numberOfBlocks -= 1; // if false, removes the block
+      else if (grid[this.y][this.x + i] === 0) { // if it's an empty space, removes a block from platform
+        removedBlocks++; 
       }
     }
   }
@@ -119,7 +133,7 @@ function keyPressed() {
 
     row++;
 
-    let thePlatform = new Platform(random(gridDimensions), row, numberOfBlocks);
+    let thePlatform = new Platform(random(gridDimensions), row, removedBlocks);
     platformArray.push(thePlatform);
   }
 }
