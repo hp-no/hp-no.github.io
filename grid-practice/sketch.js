@@ -3,7 +3,8 @@ let grid, level;
 let gridDimensions = 21;
 let gridSize = gridDimensions;
 let cellWidth, cellHeight;
-let theCat, player;
+let theGhost, player;
+let pelletArray = [];
 
 function preload() {
   level = loadJSON("assets/level1.json"); //assumes gridsize is 21
@@ -21,19 +22,37 @@ function setup() {
   cellHeight = height/gridDimensions;
   grid = level;
 
-  theCat = new Character(1, 1, "pink");
+  theGhost = new Character(1, 1, "pink");
   player = new Character(1, gridDimensions-2, "yellow");
+
 }
 
 function draw() {
   background(220);
   displayGrid();
-  if (frameCount % 30 === 0) {
-    theCat.randomMovement();
-  }
-  theCat.display();
   player.display();
 
+  // if (frameCount % 20 === 0) {
+  //   theGhost.randomMovement();
+  // }
+  // theGhost.display();
+
+}
+
+class Pellet {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.radius = (cellWidth+cellHeight)/2*0.1;
+    this.theColor = "white";
+  }
+
+  display() {
+    if (grid[this.y][this.x] === 0) {
+      fill(this.theColor);
+      circle(this.x*cellWidth + cellWidth/2, this.y*cellHeight + cellHeight/2, this.radius*2);
+    }
+  }
 }
 
 class Character {
@@ -42,7 +61,6 @@ class Character {
     this.y = y;
     this.radius = (cellWidth+cellHeight)/2*0.325;
     this.theColor = theColor;
-
   }
 
   display() {
@@ -50,30 +68,28 @@ class Character {
     circle(this.x*cellWidth + cellWidth/2, this.y*cellHeight + cellHeight/2, this.radius*2);
   }
 
-  randomMovement() {
-    let choice = random(100);
-    if (choice < 25) { // down
-      while (grid[this.x][this.y-1] === 0) {
-        this.moveTo(this.x, this.y-1);
-      }
-    }
-    else if (choice < 50) { // up
-      this.moveTo(this.x, this.y+1);
-    }
-    else if (choice < 75) { // left
-      this.moveTo(this.x-1, this.y);
-    }
-    else { // right
-      this.moveTo(this.x+1, this.y);
+  moveTo(newX, newY) {
+    //make sure there's no walls before moving
+    if (grid[newY][newX] === 0 || grid[newY][newX] === 9) {
+      this.x = newX;
+      this.y = newY;
+      grid[this.y][this.x] = 9;
     }
   }
 
-  moveTo(newX, newY) {
-    //make sure there's no walls before moving
-    if (grid[newY][newX] === 0) {
-      this.x = newX;
-      this.y = newY;
-    }
+  randomMovement() { //for ghosts
+    // if (this.y > player.y && grid[this.x][this.y-1] === 0) { // up
+    //   this.moveTo(this.x, this.y-1);
+    // }
+    // else if (this.x > player.x && grid[this.x-1][this.y] === 0) { // left
+    //   this.moveTo(this.x-1, this.y);
+    // } 
+    // else if (this.x < player.x && grid[this.x+1][this.y] === 0) { // right
+    //   this.moveTo(this.x+1, this.y);
+    // }
+    // else if (this.y < player.y && grid[this.x][this.y+1] === 0) { //down
+    //   this.moveTo(this.x, this.y+1);
+    // }
   }
 }
 
@@ -92,48 +108,29 @@ function keyPressed() {
   }
 }
 
-// function mousePressed() {
-//   let cellWidth = width/gridSize;
-//   let cellHeight = height/gridSize;
-
-//   let cellX = Math.floor(mouseX/cellWidth);
-//   let cellY = Math.floor(mouseY/cellHeight);
-
-//   if (grid[cellY][cellX] === 1) {
-//     grid[cellY][cellX] = 0;
-//   }
-//   else if (grid[cellY][cellX] === 0) {
-//     grid[cellY][cellX] = 1;
-//   }
-// }
-
 function displayGrid() {
+  n = 0; //number of pellets
   for (let y=0; y<gridDimensions; y++) {
     for (let x=0; x<gridDimensions; x++) {
-      if (grid[y][x] !== 1) {
+      if (grid[y][x] === 0) {
         fill(0);
       }
       if (grid[y][x] === 1) {
         fill("blue");
       }
+      if (grid[y][x] === 9) {
+        
+        fill(0);
+      }
       noStroke();
       rect(x*cellWidth, y*cellHeight, cellWidth, cellHeight);
-    }
-  }
-}
 
-function createBase2DArray(rows, cols) {
-  let grid = [];
-  for (let y=0; y<rows; y++) {
-    grid.push([]);
-    for (let x=0; x<cols; x++) {
-      if (x === 0 || x === gridDimensions-1 || y === 0 || y === gridDimensions-1) {
-        grid[y].push(1);
-      }
-      else {
-        grid[y].push(0);
+      if (grid[y][x] === 0) {
+        let thePellet = new Pellet(x, y);
+        pelletArray.push(thePellet);
+        pelletArray[n].display();
+        n++;
       }
     }
   }
-  return grid;
 }
